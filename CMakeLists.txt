@@ -30,10 +30,15 @@ if (KEMAI_BUILD_LOCAL_DEPENDENCIES)
             GIT_REPOSITORY https://github.com/gabime/spdlog.git
             GIT_TAG v1.15.0
             OVERRIDE_FIND_PACKAGE)
+    FetchContent_Declare(json
+            GIT_REPOSITORY https://github.com/nlohmann/json.git
+            GIT_TAG v3.11.3
+            OVERRIDE_FIND_PACKAGE)
 endif (KEMAI_BUILD_LOCAL_DEPENDENCIES)
 
 # Find external dependencies
 find_package(fmt REQUIRED)
+find_package(json REQUIRED)
 find_package(magic_enum REQUIRED)
 find_package(spdlog REQUIRED)
 

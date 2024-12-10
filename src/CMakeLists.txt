@@ -10,10 +10,16 @@ set(KEMAI_QML_FILES
 
 set(KEMAI_RESX_FILES
         images/kimai_logo_transparent.svg
+        images/visibility_off.svg
+        images/visibility_on.svg
+        qml/requests.js
 )
 
 set(KEMAI_CPP_FILES
         cpp/main.cpp
+        cpp/data/profile.h
+        cpp/model/profile.cpp
+        cpp/model/profile.h
 )
 
 #
@@ -24,6 +30,11 @@ qt_standard_project_setup(
         I18N_TRANSLATED_LANGUAGES fr)
 
 qt_add_executable(${PROJECT_NAME} WIN32 MACOSX_BUNDLE ${KEMAI_CPP_FILES})
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+        WIN32_EXECUTABLE TRUE
+        MACOSX_BUNDLE TRUE
+)
 
 qt_add_qml_module(${PROJECT_NAME}
         URI kemai
@@ -42,6 +53,7 @@ qt_add_resources(
         FILES "qtquickcontrols2.conf")
 
 configure_file(cpp/kemaiConfig.h.in ${PROJECT_BINARY_DIR}/cpp/kemaiConfig.h)
+
 target_include_directories(${PROJECT_NAME}
         PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/cpp ${CMAKE_CURRENT_SOURCE_DIR}/cpp)
 
@@ -49,7 +61,7 @@ target_compile_definitions(${PROJECT_NAME}
         PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 
 target_link_libraries(${PROJECT_NAME}
-        PRIVATE Qt6::Gui Qt6::Quick spdlog::spdlog)
+        PRIVATE Qt6::Gui Qt6::Quick spdlog::spdlog nlohmann_json::nlohmann_json magic_enum::magic_enum)
 
 #
 # Install

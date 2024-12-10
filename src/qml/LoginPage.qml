@@ -2,7 +2,12 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import "requests.js" as Requests
+
 Page {
+
+    id: root
+    property bool isNewProfile: profileComboBox.currentValue === -1
 
     ColumnLayout {
 
@@ -26,15 +31,13 @@ Page {
             textRole: "name"
             valueRole: "index"
             model: [
-                {name: "New Profile"},
+                {name: "New Profile ...", index: -1},
                 {name: "Default", index: 11},
                 {name: "Profile 1", index: 12}
             ]
 
             onActivated: {
-                if (currentValue) {
-                    loadProfile(currentValue)
-                }
+                loadProfile(currentValue)
             }
         }
 
@@ -46,14 +49,14 @@ Page {
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 5
-                spacing: 5
+                spacing: 10
 
                 TextField {
                     id: profileNameField
                     Layout.fillWidth: true
                     placeholderText: qsTr("Enter profile name")
-                    visible: profileComboBox.currentValue === undefined
-                    text: "default"
+                    leftPadding: 10
+                    rightPadding: 10
                 }
 
                 TextField {
@@ -63,6 +66,51 @@ Page {
                     leftPadding: 10
                     rightPadding: 10
                 }
+
+                RowLayout {
+                    Layout.fillWidth: true
+
+                    TextField {
+                        id: tokenField
+                        Layout.fillWidth: true
+                        placeholderText: qsTr("API Token")
+                        echoMode: passwordVisibilityButton.checked ? TextInput.Password : TextInput.Normal
+                        leftPadding: 10
+                        rightPadding: 10
+                    }
+
+                    RoundButton {
+                        id: passwordVisibilityButton
+                        flat: true
+                        checkable: true
+                        checked: true
+                        icon.source: checked ? "qrc:/kemai/images/visibility_off.svg" : "qrc:/kemai/images/visibility_on.svg"
+                    }
+                }
+            }
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 10
+
+            Button {
+                Layout.fillWidth: true
+                text: qsTr("Test Connection")
+                onClicked: testConnection()
+                background: Rectangle {
+                    color: parent.down ? "#388E3C" : "#4CAF50"
+                    radius: 4
+                }
+            }
+
+            Text {
+                id: versionText
+                color: "white"
+                Layout.fillWidth: true
+                horizontalAlignment: Text.AlignRight
+                verticalAlignment: Text.AlignVCenter
+                font.italic: true
             }
         }
 
@@ -70,105 +118,21 @@ Page {
             Layout.fillHeight: true
         }
 
-        // Rectangle {
-        //     radius: 5
-        //     Layout.fillWidth: true
-        //
-        //     ColumnLayout {
-        //
-        //         anchors.fill: parent
-        //
-        //         TextField {
-        //             id: profileNameField
-        //             Layout.fillWidth: true
-        //             placeholderText: qsTr("Enter profile name")
-        //             visible: profileComboBox.currentIndex === 0
-        //             text: "default"
-        //         }
-        //
-        //         TextField {
-        //             id: hostField
-        //             Layout.fillWidth: true
-        //             placeholderText: qsTr("Kimai Host (e.g., https://demo.kimai.org)")
-        //             leftPadding: 10
-        //             rightPadding: 10
-        //         }
-        //
-        //         TextField {
-        //             id: tokenField
-        //             Layout.fillWidth: true
-        //             placeholderText: qsTr("API Token")
-        //             echoMode: TextInput.Password
-        //             leftPadding: 10
-        //             rightPadding: 10
-        //         }
-        //
-        //     }
-        // }
-        //
-        // RowLayout {
-        //     Layout.fillWidth: true
-        //     spacing: 10
-        //
-        //     Button {
-        //         Layout.fillWidth: true
-        //         text: qsTr("Test Connection")
-        //         onClicked: testConnection()
-        //         background: Rectangle {
-        //             color: parent.down ? "#388E3C" : "#4CAF50"
-        //             radius: 4
-        //         }
-        //         contentItem: Text {
-        //             text: parent.text
-        //             color: "white"
-        //             horizontalAlignment: Text.AlignHCenter
-        //             verticalAlignment: Text.AlignVCenter
-        //         }
-        //     }
-        //
-        //     Text {
-        //         id: versionText
-        //         Layout.fillWidth: true
-        //         horizontalAlignment: Text.AlignRight
-        //         verticalAlignment: Text.AlignVCenter
-        //         font.italic: true
-        //     }
-        // }
-    }
+        RoundButton {
+            Layout.fillWidth: true
 
-    // ColumnLayout {
-    //     anchors.centerIn: parent
-    //     anchors.fill: parent
-    //     anchors.margins: 40
-    //     spacing: 20
-    //
-    //     CheckBox {
-    //         id: rememberMe
-    //         text: qsTr("Save profile")
-    //         visible: profileComboBox.currentIndex === 0
-    //     }
-    //
-    //     Button {
-    //         Layout.fillWidth: true
-    //         text: qsTr("Login")
-    //         onClicked: {
-    //             if (profileComboBox.currentIndex === 0 && rememberMe.checked) {
-    //                 saveProfile(profileNameField.text)
-    //             }
-    //             login()
-    //         }
-    //         background: Rectangle {
-    //             color: parent.down ? "#1565C0" : "#2196F3"
-    //             radius: 4
-    //         }
-    //         contentItem: Text {
-    //             text: parent.text
-    //             color: "white"
-    //             horizontalAlignment: Text.AlignHCenter
-    //             verticalAlignment: Text.AlignVCenter
-    //         }
-    //     }
-    // }
+            text: root.isNewProfile ? qsTr("Save && Login") : qsTr("Login")
+
+            background: Rectangle {
+                color: parent.down ? "#1565C0" : "#2196F3"
+                radius: parent.radius
+            }
+
+            onClicked: {
+                login()
+            }
+        }
+    }
 
     function saveProfile(profileName) {
         if (profileName.trim() === "") {
@@ -184,9 +148,16 @@ Page {
     function loadProfile(index) {
         // TODO: Implement loading profile logic
         console.log("Loading profile:", index)
-        // Simulate loading a profile
-        // hostField.text = "https://demo" + index + ".kimai.org"
-        // tokenField.text = "token" + index
+        if (index === -1) {
+            profileNameField.text = ""
+            hostField.text = ""
+            tokenField.text = ""
+
+        } else {
+            profileNameField.text = profileComboBox.currentText
+            hostField.text = "https://demo-stable.kimai.org"
+            tokenField.text = "1f715dca8821e39a7bb1f8733"
+        }
     }
 
     function login() {
@@ -195,20 +166,14 @@ Page {
     }
 
     function testConnection() {
-        // TODO: Implement actual API call to test connection and get version
         console.log("Testing connection to:", hostField.text)
 
-        // Simulating an API call with a delay
-        versionText.text = "Connecting..."
-        timer.start()
-    }
-
-    Timer {
-        id: timer
-        interval: 1500 // 1.5 seconds delay to simulate API call
-        onTriggered: {
-            // TODO: Replace this with actual API response handling
-            versionText.text = "Kimai v1.23.4" // Example version
-        }
+        Requests.getVersion(hostField.text, tokenField.text, function (response) {
+            if (response.status === 200) {
+                versionText.text = "Kimai v" + response.data.version
+            } else {
+                versionText.text = "Connection failed: " + response.statusText
+            }
+        })
     }
 }
