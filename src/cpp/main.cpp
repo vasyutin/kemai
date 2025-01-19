@@ -1,11 +1,13 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
 
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
 #include "kemaiConfig.h"
 #include "misc/customFmt.h"
+#include "model/profile.h"
 
 void kemaiQtMessageOutputHandler(QtMsgType type, const QMessageLogContext& /*context*/, const QString& msg)
 {
@@ -38,7 +40,6 @@ int main(int argc, char* argv[])
         QGuiApplication::setOrganizationName("Kemai");
         QGuiApplication::setApplicationVersion(KEMAI_VERSION);
 
-        // Create spdlog sinks : console, rotating file (3 x 5Mb) and Qt Object
         std::vector<spdlog::sink_ptr> sinks;
         sinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
 
@@ -49,7 +50,13 @@ int main(int argc, char* argv[])
 
         logger->info("===== Starting Kemai {} =====", KEMAI_VERSION);
 
+        kemai::ProfileModel profileModel;
+        profileModel.setProfiles({
+            {"Demo", "https://demo.kimai.org", "f7a0f2ce7901a9018f86b3119"}
+        });
+
         QQmlApplicationEngine engine;
+        engine.setInitialProperties({{"profileModel", QVariant::fromValue(&profileModel)}});
         engine.loadFromModule("kemai", "Main");
 
         return QGuiApplication::exec();

@@ -27,17 +27,11 @@ Page {
             id: profileComboBox
             Layout.fillWidth: true
 
-            // TODO: Replace with real model
             textRole: "name"
-            valueRole: "index"
-            model: [
-                {name: "New Profile ...", index: -1},
-                {name: "Default", index: 11},
-                {name: "Profile 1", index: 12}
-            ]
+            model: main.profileModel
 
-            onActivated: {
-                loadProfile(currentValue)
+            onCurrentIndexChanged: {
+                loadProfile(currentIndex)
             }
         }
 
@@ -146,17 +140,15 @@ Page {
     }
 
     function loadProfile(index) {
-        // TODO: Implement loading profile logic
-        console.log("Loading profile:", index)
         if (index === -1) {
             profileNameField.text = ""
             hostField.text = ""
             tokenField.text = ""
-
         } else {
-            profileNameField.text = profileComboBox.currentText
-            hostField.text = "https://demo-stable.kimai.org"
-            tokenField.text = "1f715dca8821e39a7bb1f8733"
+            let data = profileComboBox.model.get(index);
+            profileNameField.text = data.name
+            hostField.text = data.host
+            tokenField.text = data.token
         }
     }
 

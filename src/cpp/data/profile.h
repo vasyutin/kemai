@@ -1,15 +1,15 @@
 #pragma once
 
-// STL headers
-#include <string>
+// Qt headers
+#include <QString>
 
 namespace kemai {
 
 struct Profile
 {
-    std::string name;
-    std::string host;
-    std::string token;
+    QString name;
+    QString host;
+    QString token;
 };
 
 } // namespace kemai

@@ -16,6 +16,20 @@ void ProfileModel::setProfiles(const std::vector<Profile>& profiles)
     endResetModel();
 }
 
+QVariantMap ProfileModel::get(int index) const
+{
+    if (index >= 0 && index < m_profiles.size())
+    {
+        const auto& profile = m_profiles[index];
+        return {
+            {"name", profile.name},
+            {"host", profile.host},
+            {"token", profile.token},
+        };
+    }
+    return {};
+}
+
 int ProfileModel::rowCount(const QModelIndex& parent) const
 {
     return static_cast<int>(m_profiles.size());
@@ -32,11 +46,11 @@ QVariant ProfileModel::data(const QModelIndex& index, int role) const
     switch (static_cast<ProfileRole>(role))
     {
     case ProfileRole::Name:
-        return QString::fromStdString(profile.name);
+        return profile.name;
     case ProfileRole::Host:
-        return QString::fromStdString(profile.host);
+        return profile.host;
     case ProfileRole::Token:
-        return QString::fromStdString(profile.token);
+        return profile.token;
     default:
         return {};
     }

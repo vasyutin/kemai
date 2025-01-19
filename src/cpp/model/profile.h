@@ -27,6 +27,7 @@ public:
     ~ProfileModel() override;
 
     void setProfiles(const std::vector<Profile>& profiles);
+    Q_INVOKABLE QVariantMap get(int index) const;
 
     int rowCount(const QModelIndex& parent) const override;
     QVariant data(const QModelIndex& index, int role) const override;
