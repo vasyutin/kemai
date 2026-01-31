@@ -8,6 +8,7 @@
 #include <QDateTime>
 #include <QMutex>
 #include <QRegularExpression>
+#include <QTimeZone>
 
 namespace kemai {
 
@@ -63,7 +64,9 @@ protected:
 
         // clang-format off
         LoggerEntry entry{
-            QDateTime::fromMSecsSinceEpoch(timeInMSec.time_since_epoch().count(), Qt::UTC),
+            // SV
+            //QDateTime::fromMSecsSinceEpoch(timeInMSec.time_since_epoch().count(), Qt::UTC),
+            QDateTime::fromMSecsSinceEpoch(timeInMSec.time_since_epoch().count(), QTimeZone::UTC),
             QString::fromUtf8(msg.payload.data(), static_cast<int>(msg.payload.size())).remove("<===").remove("===>").trimmed(),
             msg.level};
         // clang-format on
