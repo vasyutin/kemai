@@ -58,6 +58,8 @@ void ActivityWidget::setKemaiSession(std::shared_ptr<KemaiSession> kemaiSession)
     mUi->cbProject->clear();
     mUi->cbCustomer->clear();
     mUi->lwHistory->clear();
+    mUi->pteDescription->clear();
+    mUi->leTags->clear();
 
     if (mSession)
     {
@@ -233,6 +235,16 @@ void ActivityWidget::onSessionCacheSynchronizeFinished()
     mUi->cbActivity->setKimaiData(mSession->cache().activities());
     updateRecentTimeSheetsView();
     setEnabled(true);
+
+    // Populate fields from latest history entry if no current timesheet is running
+    if (!mSession->hasCurrentTimeSheet())
+    {
+        const auto& recentTimeSheets = mSession->cache().recentTimeSheets();
+        if (!recentTimeSheets.empty())
+        {
+            fillFromTimesheet(recentTimeSheets.front());
+        }
+    }
 
     // Update all fields in case cache have refreshed with a running timesheet
     if (mSession->hasCurrentTimeSheet())
